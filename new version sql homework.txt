@@ -1,0 +1,156 @@
+CREATE DATABASE University
+USE University
+
+/****Script for creating University Table****/
+CREATE TABLE Universities(
+UniversityID int identity(1, 1) PRIMARY KEY,
+UniversityName varchar(30) NOT NULL
+)
+
+/****Script for creating Faculty Table****/
+CREATE TABLE Faculties(
+FacultyID int IDENTITY(1,1) PRIMARY KEY,
+FacultyName varchar(30) NOT NULL,
+UniversityID int FOREIGN KEY REFERENCES Universities(UniversityID)
+)
+
+/****Script for creating Groups Table****/
+CREATE TABLE Groups(
+GroupID int identity(1, 1) PRIMARY KEY,
+GroupName varchar(10) NOT NULL,
+FacultyID int FOREIGN KEY REFERENCES Faculties(FacultyID)
+)
+
+/****Script for creating Students Table****/
+CREATE TABLE Students(
+StudentID int identity(1, 1) PRIMARY KEY,
+FirstName varchar(10),
+LastName  varchar(20),
+GroupID int FOREIGN KEY REFERENCES Groups(GroupID)
+)
+
+/****Script for creating Subjects Table****/
+CREATE TABLE Subjects(
+SubjectID int identity(1, 1) PRIMARY KEY,
+SubjectName varchar(30) UNIQUE,
+)
+
+/****Script for Join Table, many-to-many relation between Students and Marks ****/
+CREATE TABLE Students_Marks (
+StudentID  int  NOT NULL,
+SubjectID int  NOT NULL,
+MarkValue int,
+FOREIGN KEY(StudentID)  REFERENCES Students(StudentID),
+FOREIGN KEY(SubjectID)  REFERENCES Subjects(SubjectID)
+)
+
+/***getAverageMarkOfGroupFromSubject***/
+SELECT AVG(MarkValue)
+AS AverageMark
+FROM Students_Marks;
+
+/***getAverageMarkOfGroupFromSubject, using JOIN ***/
+SELECT AVG(Students_Marks.MarkValue)
+AS AverageMark
+FROM Students 
+INNER JOIN Students_Marks ON Students_Marks.SubjectID=5  /**subject-English**/
+AND Students.GroupID=1   /**group 702**/
+AND Students.StudentID=Students_Marks.StudentID
+
+/***getAverageMarkOfGroupFromSubject, without JOIN ***/
+SELECT AVG(Students_Marks.MarkValue)
+AS AverageMark
+FROM Students, Students_Marks
+WHERE Students_Marks.SubjectID=3
+AND Students.GroupID =3
+AND Students.StudentID=Students_Marks.StudentID
+
+/***getAverageMarkOfFacultyFromSubject, without JOIN ***/
+SELECT AVG(Students_Marks.MarkValue)
+AS AverageMark
+FROM Students, Students_Marks,Groups
+WHERE Students_Marks.StudentID=Students_Marks.StudentID
+AND Groups.FacultyID=2 
+AND Students.StudentID=Students_Marks.StudentID
+AND Students.GroupID=Groups.GroupID
+
+/***getAverageMarkOfUniversityFromSubject, without JOIN ***/
+SELECT AVG(Students_Marks.MarkValue)
+AS AverageMark
+FROM Students, Students_Marks,Groups,Faculties
+WHERE Students_Marks.SubjectID=4
+AND Faculties.UniversityID=1
+AND Students.StudentID=Students_Marks.StudentID
+AND Students.GroupID=Groups.GroupID
+
+
+/****Script for adding "Universities" table's fields ****/
+INSERT INTO Universities(UniversityName)
+VALUES('YSU')
+
+/****Script for adding "Faculties" table's fields ****/
+ INSERT INTO Faculties(FacultyName,UniversityID)
+ VALUES('Applied_Mathematics',1),
+       ('Romano_Gemanic',1)
+
+/****Script for adding "Groups" table's fields ****/
+ INSERT INTO Groups (GroupName,FacultyID)
+ VALUES('702',1),
+       ('701',1),
+       ('501',2),
+       ('502',2)
+
+/****Script for adding "Students" table's fields ****/
+INSERT INTO Students(FirstName,LastName,GroupID)
+VALUES('Ani','Poghosyan',2),
+      ('Aram','Nikolyan',2),
+      ('Lilit','Azizyan',2),
+      ('Anna','Poghosyan',1),
+      ('Aram','Nikolyan',1),
+      ('Karine','Poghosyan',3),
+      ('Minas','Nikolyan',3),
+      ('Marine','Khachatryan',4),
+      ('Davit','Grigoryan',4)
+
+/****Script for adding "Subjects" table's fields ****/
+INSERT INTO Subjects(SubjectName)
+VALUES('MATHEMATICS'),
+      ('ARMENIAN'),
+      ('LOGIC'),
+      ('SOCIOLOGY'),
+      ('PHYSICS'),
+      ('ENGLISH')
+
+/****Script for adding "Students_Marks" table's fields ****/
+INSERT INTO Students_Marks(StudentID,SubjectID,MarkValue)
+VALUES(1,5,4),
+      (1,2,5),
+      (1,4,3),
+      (1,3,5),
+      (2,3,5),
+      (2,1,5),
+      (2,4,3),
+      (3,6,3),
+      (3,3,3),
+      (3,2,3),
+      (4,4,5),
+      (4,6,4),
+      (4,5,3),
+      (4,3,5),
+      (5,5,3),
+      (5,4,3),
+      (5,2,3),
+      (6,1,3),
+      (6,3,3),
+      (6,4,3),
+      (6,2,3),
+      (7,6,3),
+      (7,3,3),
+      (7,2,3),
+      (8,6,3),
+      (8,4,3),
+      (8,5,3),
+      (9,6,3),
+      (9,5,3),
+      (9,4,3),
+      (9,2,3)
